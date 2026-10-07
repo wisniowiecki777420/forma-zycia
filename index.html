@@ -84,6 +84,19 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;text-transform:uppe
 .plan .t strong{display:block;font-family:var(--display);font-size:21px;text-transform:uppercase;line-height:1.05}
 .plan .meta{font-size:13px;color:var(--muted)}
 .chev{color:var(--muted);font-size:20px}
+button.wd{font:inherit;color:inherit;cursor:pointer}
+.pv-top{display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px}
+.pv-dots{display:flex;gap:6px}
+.pv-dot{width:34px;height:34px;border-radius:50%;border:2px solid transparent;background:var(--sunk);font-family:var(--display);font-weight:700;font-size:16px;color:var(--muted)}
+.pv-dot.on{background:var(--pc);color:#fff;border-color:color-mix(in srgb,var(--pc) 70%,#000)}
+.pv-nav{display:flex;gap:8px}
+.pv-nav .ghost{min-width:48px;font-size:20px;line-height:1}
+.pv-list{display:grid;gap:8px;margin-top:10px}
+.pv-ex{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px}
+.pv-h{display:flex;justify-content:space-between;gap:8px;align-items:flex-start}
+.pv-h strong{font-weight:600;line-height:1.25;min-width:0}
+.pv-l{display:grid;grid-template-columns:84px 1fr;gap:8px;margin-top:6px;font-size:15px;align-items:baseline}
+.pv-l .lbl{font-size:11px}
 
 /* workout */
 .wohead{position:sticky;top:calc(env(safe-area-inset-top,0px) + 52px);z-index:4;background:var(--bg);padding-block:12px 10px;display:flex;align-items:center;gap:12px;border-bottom:1px solid var(--line)}
@@ -188,32 +201,35 @@ const STANDALONE=true;
 /* t: bb sztanga, db hantle (kg na hantlę), mc maszyna/wyciąg/Smith, bw masa ciała (+kg dociążenia), kb kettlebell, core tylko powtórzenia */
 const INC={bb:2.5,db:2,mc:2.5,bw:2.5,kb:4,core:0};
 const PLAN = {
-  A:{name:"Góra A",sub:"Siła · klatka dół, plecy",when:"Poniedziałek",color:"red",time:"ok. 85–90 min",cardio:"Worek 5 × 2 min",cardioMin:10,ex:[
-    {id:"decline",n:"Wyciskanie na ławce ujemnej",t:"bb",s:4,r:"6–8",note:"Przed płaską, na wyrównanie dołu klatki"},
-    {id:"db_flat",n:"Wyciskanie hantli na płaskiej",t:"db",s:3,r:"6–10"},
-    {id:"bb_row",n:"Wiosłowanie sztangą",t:"bb",s:4,r:"6–8"},
+  A:{name:"Trening 1",sub:"Góra · siła",color:"red",time:"ok. 60–65 min",cardio:"Worek 5 × 2 min (opcjonalnie)",cardioMin:10,ex:[
+    {id:"decline",n:"Wyciskanie na ławce ujemnej",t:"bb",s:3,r:"6–10",ramp:[10,8,6],note:"Najpierw 1–2 serie wstępne, lekko. Potem 3 serie z rosnącym ciężarem."},
+    {id:"db_flat",n:"Wyciskanie hantli na płaskiej",t:"db",s:3,r:"8–10"},
     {id:"pullup",n:"Podciąganie nachwytem",t:"bw",s:3,r:"6–10"},
-    {id:"rev_fly",n:"Odwrotne rozpiętki na maszynie (tył barku)",t:"mc",s:3,r:"12–20",ss:"A"},
-    {id:"db_shrug",n:"Szrugsy z hantlami (kaptury)",t:"db",s:3,r:"10–15",ss:"A"},
-    {id:"dips",n:"Dipy na poręczach",t:"bw",s:3,r:"6–10",note:"Tułów pionowo, łokcie blisko ciała"},
+    {id:"db_row",n:"Wiosłowanie hantlą jednorącz",t:"db",s:3,r:"6–8",note:"Ciężko, na każdą rękę"},
+    {id:"rev_fly",n:"Odwrotne rozpiętki na maszynie (tył barku)",t:"mc",s:3,r:"12–20"},
+    {id:"dips",n:"Dipy na poręczach",t:"bw",s:3,r:"6–10",ss:"A",note:"Tułów pionowo, łokcie blisko ciała"},
+    {id:"sup_curl",n:"Uginanie hantli z supinacją siedząc",t:"db",s:3,r:"10–12",ss:"A"},
     {id:"bb_curl",n:"Uginanie ramion ze sztangą stojąc",t:"bb",s:3,r:"6–10",ss:"B"},
     {id:"ez_skull",n:"Francuskie sztangą łamaną leżąc za głowę",t:"bb",s:3,r:"8–12",ss:"B"},
-    {id:"sup_curl",n:"Uginanie hantli z supinacją siedząc",t:"db",s:2,r:"10–12"},
     {id:"hang_lr",n:"Unoszenie nóg w zwisie",t:"core",s:3,r:"10–15",core:1}
   ]},
-  B:{name:"Dół A",sub:"Siła · martwy ciąg",when:"Wtorek",color:"blue",time:"ok. 65–70 min",cardio:"Rower 15–20 min",cardioMin:15,ex:[
-    {id:"deadlift",n:"Martwy ciąg klasyczny",t:"bb",s:3,r:"4–6",note:"Plecy neutralne, ostatnie powtórzenie bez walki"},
+  B:{name:"Trening 2",sub:"Dół · siła, martwy ciąg",color:"blue",time:"ok. 55–60 min",cardio:"Rower 15–20 min (opcjonalnie)",cardioMin:15,ex:[
+    {id:"deadlift",n:"Martwy ciąg klasyczny",t:"bb",s:3,r:"4–6",note:"Najpierw 2–3 serie wstępne. Plecy neutralne, ostatnie powtórzenie bez walki."},
     {id:"bulgarian",n:"Wykroki bułgarskie (na nogę)",t:"db",s:3,r:"8–10"},
-    {id:"leg_curl",n:"Uginanie nóg na maszynie",t:"mc",s:3,r:"10–15"},
-    {id:"calf_st",n:"Wspięcia na palce stojąc",t:"mc",s:3,r:"12–15"},
-    {id:"decl_crunch",n:"Brzuszki na ławce ujemnej",t:"core",s:3,r:"12–15",core:1},
-    {id:"kb_twist",n:"Skręty tułowia z kettlem (na stronę)",t:"kb",s:3,r:"10–15",core:1,note:"Wolno i pod kontrolą"}
+    {id:"leg_curl",n:"Uginanie nóg leżąc (dwugłowe uda)",t:"mc",s:3,r:"8–12"},
+    {id:"db_shrug",n:"Szrugsy z hantlami (kaptury)",t:"db",s:3,r:"10–15"},
+    {id:"lat_raise",n:"Wznosy bokiem",t:"db",s:3,r:"12–20",ss:"A",inc:1},
+    {id:"calf_st",n:"Wspięcia na palce stojąc",t:"mc",s:3,r:"12–15",ss:"A"},
+    {id:"adductor",n:"Przywodzenie nóg na maszynie (przywodziciele)",t:"mc",s:3,r:"12–20",ss:"B"},
+    {id:"abductor",n:"Odwodzenie nóg na maszynie (odwodziciele)",t:"mc",s:3,r:"12–20",ss:"B"},
+    {id:"decl_crunch",n:"Brzuszki na ławce ujemnej",t:"core",s:3,r:"12–15",core:1,ss:"C"},
+    {id:"kb_twist",n:"Skręty tułowia z kettlem (na stronę)",t:"kb",s:3,r:"10–15",core:1,ss:"C",note:"Wolno i pod kontrolą"}
   ]},
-  C:{name:"Góra B",sub:"Objętość · klatka góra, barki",when:"Czwartek",color:"yellow",time:"ok. 80 min",cardio:"Worek lub rower 15 min",cardioMin:15,ex:[
-    {id:"smith_inc",n:"Wyciskanie na skosie dodatnim (Smith)",t:"mc",s:3,r:"8–12"},
-    {id:"pec_deck",n:"Rozpiętki na maszynie",t:"mc",s:3,r:"12–15"},
+  C:{name:"Trening 3",sub:"Góra · objętość",color:"yellow",time:"ok. 60–65 min",cardio:"Worek lub rower 15 min (opcjonalnie)",cardioMin:15,ex:[
+    {id:"smith_inc",n:"Wyciskanie na skosie dodatnim (Smith)",t:"mc",s:3,r:"8–12",ramp:[12,10,8],note:"Najpierw 1–2 serie wstępne, lekko. Potem 3 serie z rosnącym ciężarem."},
+    {id:"pec_deck",n:"Rozpiętki na maszynie lub wyciągu",t:"mc",s:3,r:"12–15"},
     {id:"chinup",n:"Podciąganie podchwytem",t:"bw",s:3,r:"6–10",note:"Plecy i biceps naraz"},
-    {id:"db_row",n:"Wiosłowanie hantlą jednorącz",t:"db",s:3,r:"10–12"},
+    {id:"cable_row",n:"Wiosłowanie siedząc na wyciągu",t:"mc",s:3,r:"10–12"},
     {id:"lat_raise",n:"Wznosy bokiem",t:"db",s:3,r:"12–20",ss:"A",inc:1},
     {id:"face_pull",n:"Face pull (tył barku)",t:"mc",s:3,r:"15–20",ss:"A"},
     {id:"smith_shrug",n:"Szrugsy na Smithie (kaptury)",t:"mc",s:3,r:"12–15"},
@@ -223,16 +239,23 @@ const PLAN = {
     {id:"pd_pron",n:"Prostowanie na wyciągu górnym nachwytem",t:"mc",s:2,r:"12–15",ss:"C"},
     {id:"decl_crunch",n:"Brzuszki na ławce ujemnej",t:"core",s:3,r:"12–15",core:1}
   ]},
-  D:{name:"Dół B",sub:"Objętość · przysiad",when:"Sobota lub niedziela",color:"green",time:"ok. 65 min",cardio:"Rower lub basen 15–20 min",cardioMin:15,ex:[
-    {id:"squat",n:"Przysiad ze sztangą lub hack",t:"bb",s:3,r:"6–10"},
+  D:{name:"Trening 4",sub:"Dół · objętość, przysiad",color:"green",time:"ok. 60 min",cardio:"Rower lub basen 15–20 min (opcjonalnie)",cardioMin:15,ex:[
+    {id:"squat",n:"Przysiad ze sztangą lub hack",t:"bb",s:3,r:"6–10",note:"Najpierw 2 serie wstępne"},
     {id:"leg_press",n:"Wypychanie na suwnicy (leg press)",t:"mc",s:3,r:"10–15",inc:5},
+    {id:"rdl",n:"RDL z hantlami",t:"db",s:3,r:"8–12",note:"Lżej i technicznie. Gdy dół pleców marudzi po przysiadzie, zrób uginanie nóg siedząc."},
     {id:"hip_thrust",n:"Hip thrust",t:"bb",s:3,r:"8–12",inc:5},
     {id:"leg_ext",n:"Prostowanie nóg na maszynie",t:"mc",s:2,r:"12–15"},
-    {id:"calf_seat",n:"Wspięcia na palce siedząc",t:"mc",s:3,r:"12–20"},
-    {id:"hang_lr",n:"Unoszenie nóg w zwisie",t:"core",s:3,r:"10–15",core:1},
-    {id:"kb_twist",n:"Skręty tułowia z kettlem (na stronę)",t:"kb",s:3,r:"10–15",core:1,note:"Wolno i pod kontrolą"}
+    {id:"lat_raise",n:"Wznosy bokiem",t:"db",s:3,r:"12–20",ss:"A",inc:1},
+    {id:"calf_seat",n:"Wspięcia na palce siedząc",t:"mc",s:3,r:"12–20",ss:"A"},
+    {id:"adductor",n:"Przywodzenie nóg na maszynie (przywodziciele)",t:"mc",s:3,r:"12–20",ss:"B"},
+    {id:"abductor",n:"Odwodzenie nóg na maszynie (odwodziciele)",t:"mc",s:3,r:"12–20",ss:"B"},
+    {id:"hang_lr",n:"Unoszenie nóg w zwisie",t:"core",s:3,r:"10–15",core:1,ss:"C"},
+    {id:"kb_twist",n:"Skręty tułowia z kettlem (na stronę)",t:"kb",s:3,r:"10–15",core:1,ss:"C",note:"Wolno i pod kontrolą"}
   ]}
 };
+const LEGACY={bb_row:"Wiosłowanie sztangą"};
+function exInfo(id){for(const w of ORDER_){const e=PLAN[w].ex.find(x=>x.id===id);if(e)return e}return {id,n:LEGACY[id]||id,t:"bb"}}
+const ORDER_=["A","B","C","D"];
 const ORDER=["A","B","C","D"];
 const WEEK=[{d:"Pn",w:"A"},{d:"Wt",w:"B"},{d:"Śr"},{d:"Cz",w:"C"},{d:"Pt"},{d:"So",w:"D"},{d:"Nd"}];
 const WEEKLBL=["Góra A","Dół A","wolne","Góra B","wolne","Dół B / sport","sport / Dół B"];
@@ -302,7 +325,9 @@ const fmt=v=>{const n=parseNum(v);if(n==null)return"";return (Math.round(n*100)/
 const range=r=>{const m=String(r).match(/(\d+)\s*[–-]\s*(\d+)/);return m?[+m[1],+m[2]]:[+r,+r]};
 const dayIdx=()=>(new Date().getDay()+6)%7;
 const dateLbl=t=>new Date(t).toLocaleDateString("pl-PL",{weekday:"short",day:"numeric",month:"short"});
-const plateHTML=w=>`<div class="plate pc-${PLAN[w].color}" aria-hidden="true">${w}</div>`;
+const NUM={A:1,B:2,C:3,D:4};
+const scheme=e=>e.ramp?"rampa "+e.ramp.join("-"):`${e.s}×${e.r}`;
+const plateHTML=w=>`<div class="plate pc-${PLAN[w].color}" aria-hidden="true">${NUM[w]}</div>`;
 function toast(msg){const h=$("#toastHost");h.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>h.innerHTML="",2800)}
 const incOf=e=>e.inc!=null?e.inc:INC[e.t];
 const roundTo=(x,inc)=>inc?Math.round(x/inc)*inc:x;
@@ -315,7 +340,26 @@ function lastFor(exId,excludeId){
   return null;
 }
 /* Prescription: double progression */
+function rampPct(n){return n.map((_,j)=>1-0.075*(n.length-1-j))}
+function prescribeRamp(e,excludeId){
+  const inc=incOf(e)||2.5, tg=e.ramp, last=lastFor(e.id,excludeId);
+  if(!last){
+    const st=settings.start[e.id]; const top=st!=null&&st!==""?parseNum(st):null;
+    if(top==null) return {kg:null,kgs:tg.map(()=>null),reps:tg.slice(),why:"need",base:null};
+    return {kg:top,kgs:rampPct(tg).map(f=>roundTo(top*f,inc)),reps:tg.slice(),why:"start",base:top};
+  }
+  const lk=last.sets.map(x=>parseNum(x.kg)??0), lr=last.sets.map(x=>parseNum(x.reps)??0);
+  const top=Math.max(...lk);
+  const isRamp=lk.length===tg.length&&lk.some((k,j)=>j>0&&k>lk[j-1]);
+  const baseK=isRamp?lk:rampPct(tg).map(f=>roundTo(top*f,inc));
+  const hit=isRamp&&lr.every((r,j)=>r>=tg[j]);
+  const bad=lr.filter((r,j)=>r<(tg[j]??tg[tg.length-1])-2).length;
+  if(hit) return {kg:top+inc,kgs:baseK.map(k=>roundTo(k+inc,inc)),reps:tg.slice(),why:"up",base:top};
+  if(bad>=2&&top>0) return {kg:top,kgs:baseK.map(k=>Math.max(0,roundTo(k*0.95,inc))),reps:tg.slice(),why:"down",base:top};
+  return {kg:top,kgs:baseK,reps:tg.slice(),why:isRamp?"rampkeep":"start",base:top};
+}
 function prescribe(e,excludeId){
+  if(e.ramp) return prescribeRamp(e,excludeId);
   const [lo,hi]=range(e.r); const inc=incOf(e); const noKg=e.t==="core";
   const last=lastFor(e.id,excludeId);
   if(!last){
@@ -344,36 +388,38 @@ const needsSetup=()=>uniqueEx().some(([w,e])=>e.t!=="core"&&e.t!=="bw"&&(setting
 
 /* ---------- views ---------- */
 let tab="plan", openHist=null, delArm=null, sportPick="Bieganie";
-function setTab(t){tab=t;delArm=null;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));render();window.scrollTo(0,0)}
+let preview=null;
+function setTab(t){tab=t;delArm=null;preview=null;document.querySelectorAll("nav.tabs button").forEach(b=>b.setAttribute("aria-selected",b.dataset.tab===t));render();window.scrollTo(0,0)}
 
 function render(){
   $("#todayLbl").textContent=new Date().toLocaleDateString("pl-PL",{weekday:"long",day:"numeric",month:"long"});
   const v=$("#view");
-  if(tab==="plan") v.innerHTML=viewPlan();
+  if(tab==="plan") v.innerHTML=preview?viewPreview(preview):viewPlan();
   else if(tab==="wo") v.innerHTML=active?viewWorkout():viewNoWorkout();
   else if(tab==="hist") v.innerHTML=viewHist();
   else v.innerHTML=viewMore();
   if(tab==="wo"&&active) updateProgress();
 }
 
+function gymDone(){return finished().filter(s=>s.kind==="gym").sort((a,b)=>a.start-b.start)}
 function viewPlan(){
-  const di=dayIdx(), ws=weekStart();
-  const doneWk=finished().filter(s=>s.start>=ws);
-  const doneDays=new Set(doneWk.map(s=>(new Date(s.start).getDay()+6)%7));
-  const nxt=nextWorkout();
-  let planned=WEEK[di].w&&di<5?WEEK[di].w:null;
-  if(di>=5&&!doneWk.some(s=>s.wid==="D")) planned="D";
-  const w=active?active.wid:(planned||nxt), p=PLAN[w];
-  const title=active?"Trening w toku":planned?"Dziś":"Dziś wolne · następny";
-  const setup=needsSetup()?`<div class="banner"><p><b>Ustaw ciężary startowe.</b> Raz, ok. 2 min. Potem aplikacja sama podpowiada ciężar na każdą serię.</p><button class="btn small" data-act="gosetup">Ustaw</button></div>`:"";
+  const g=gymDone(), nxt=nextWorkout();
+  const w=active?active.wid:nxt, p=PLAN[w];
+  const no=g.length+1;
+  const title=active?`Trening w toku · nr ${no}`:`Następny · nr ${no}`;
+  const lastOf=k=>{for(let i=g.length-1;i>=0;i--) if(g[i].wid===k) return g[i]; return null};
+  const ago=t=>{const d=Math.floor((Date.now()-t)/864e5);return d<=0?"dziś":d===1?"wczoraj":d+" dni temu"};
+  const setup=needsSetup()?`<div class="banner"><p><b>${gymDone().length?"Uzupełnij ciężary dla nowych ćwiczeń.":"Ustaw ciężary startowe."}</b> Raz, ok. 2 min. Potem aplikacja sama podpowiada ciężar na każdą serię.</p><button class="btn small" data-act="gosetup">Ustaw</button></div>`:"";
+  const last=g[g.length-1];
   return `${setup}<section class="hero" style="--day:var(--${p.color})">
     <div class="hero-row">${plateHTML(w)}<div style="min-width:0"><div class="lbl">${title}</div><h3>${p.name}</h3><div class="small muted">${p.sub} · ${p.time}</div></div></div>
-    <button class="btn full" data-act="${active?"resume":"start"}" data-w="${w}">${active?"Wróć do treningu":"Zacznij trening"}</button></section>
-  <h2>Tydzień</h2><div class="week">${WEEK.map((d,i)=>{const pc=d.w?`style="--pc:var(--${PLAN[d.w].color})"`:"";
-    return `<div class="wd ${i===di?"now":""} ${doneDays.has(i)?"done":""}"><b>${d.d}</b><i ${pc}></i><small>${WEEKLBL[i]}</small></div>`}).join("")}</div>
-  <p class="note">Weekend: jeden dzień Dół B, drugi dowolny sport. Zielona obwódka to zrobiony trening.</p>
-  <h2>Treningi</h2><div class="plans">${ORDER.map(k=>{const q=PLAN[k];const sets=q.ex.reduce((a,e)=>a+e.s,0);
-    return `<button class="plan" data-act="start" data-w="${k}">${plateHTML(k)}<div class="t"><strong>${q.name}</strong><div class="meta">${q.when} · ${q.time} · ${q.ex.length} ćwiczeń, ${sets} serii</div></div><span class="chev">›</span></button>`}).join("")}</div>
+    <button class="btn full" data-act="${active?"resume":"start"}" data-w="${w}">${active?"Wróć do treningu":"Zacznij trening"}</button>
+    ${last&&!active?`<div class="small muted">Ostatni: ${PLAN[last.wid].name}, ${ago(last.start)}. Łącznie ${g.length} ${g.length===1?"trening":g.length%10>=2&&g.length%10<=4&&(g.length%100<10||g.length%100>=20)?"treningi":"treningów"}.</div>`:""}</section>
+  <h2>Kolejka</h2><div class="week" style="grid-template-columns:repeat(4,1fr)">${ORDER.map(k=>{const l=lastOf(k);
+    return `<button class="wd ${k===w?"now":""}" data-act="preview" data-w="${k}"><b>${PLAN[k].name}</b><i style="--pc:var(--${PLAN[k].color})"></i><small>${k===w?"następny":l?ago(l.start):"jeszcze nie"}</small></button>`}).join("")}</div>
+  <p class="note">Robisz po kolei 1, 2, 3, 4 i od nowa, w dowolne dni. Stuknij trening, żeby zobaczyć ćwiczenia i ciężary.</p>
+  <h2>Wszystkie treningi</h2><div class="plans">${ORDER.map(k=>{const q=PLAN[k];const sets=q.ex.reduce((a,e)=>a+e.s,0);
+    return `<button class="plan" data-act="preview" data-w="${k}">${plateHTML(k)}<div class="t"><strong>${q.name}</strong><div class="meta">${q.sub} · ${q.time} · ${sets} serii</div></div><span class="chev">›</span></button>`}).join("")}</div>
   <h2>Sport</h2><form class="form" id="sportForm">
     <div class="chips" role="group" aria-label="Rodzaj">${SPORTS.map(s=>`<button type="button" data-sport="${s}" aria-pressed="${s===sportPick}">${s}</button>`).join("")}</div>
     <div style="display:grid;grid-template-columns:1fr 2fr;gap:10px">
@@ -381,13 +427,42 @@ function viewPlan(){
       <label for="sNote">Notatka<input id="sNote" placeholder="np. 6 km"></label></div>
     <button class="btn" type="submit">Zapisz aktywność</button></form>`;
 }
+function goPreview(d){if(!preview)return;const i=(ORDER.indexOf(preview)+d+4)%4;preview=ORDER[i];render()}
+function kgTxt(e,k){if(e.t==="bw"){const n=parseNum(k)||0;return n?"MC+"+fmt(n):"MC"}return k==null||k===""?"?":fmt(k)}
+function setsTxt(e,arr){return arr.map(x=>(e.t==="core"?"":kgTxt(e,x.kg)+"×")+x.reps).join(", ")}
+function viewPreview(w){
+  const p=PLAN[w], sets=p.ex.reduce((a,e)=>a+e.s,0);
+  const isNext=(active?active.wid:nextWorkout())===w;
+  const row=e=>{
+    const pr=prescribe(e,active?active.id:null), last=lastFor(e.id,active?active.id:null);
+    const nxt=e.t==="core"?pr.reps.join(", ")+" powt.":(pr.kgs||pr.kg!=null)?pr.reps.map((r,j)=>{const k=pr.kgs?pr.kgs[j]:pr.kg;return kgTxt(e,k)+"×"+r}).join(", "):"ustaw ciężar startowy";
+    return `<div class="pv-ex"><div class="pv-h"><strong>${esc(e.n)}</strong><span class="tgt num">${scheme(e)}</span></div>
+      ${e.ss?`<div class="tags"><span class="tag ss">Superseria ${e.ss}</span></div>`:""}
+      <div class="pv-l"><span class="lbl">Następnie</span><span class="num">${esc(nxt)}</span></div>
+      <div class="pv-l"><span class="lbl">Ostatnio</span><span class="num muted">${last?esc(dateLbl(last.s.start)+": "+setsTxt(e,last.sets)):"jeszcze nie robione"}</span></div></div>`};
+  const main=p.ex.filter(e=>!e.core), core=p.ex.filter(e=>e.core);
+  return `<div class="pv" id="pv" style="--day:var(--${p.color})">
+    <div class="pv-top"><button class="link" data-act="pvback">‹ Plan</button>
+      <div class="pv-dots">${ORDER.map(k=>`<button class="pv-dot ${k===w?"on":""}" data-act="preview" data-w="${k}" aria-label="${PLAN[k].name}" style="--pc:var(--${PLAN[k].color})">${NUM[k]}</button>`).join("")}</div></div>
+    <section class="hero" style="margin-top:10px"><div class="hero-row">${plateHTML(w)}<div style="min-width:0;flex:1"><div class="lbl">${isNext?"Następny w kolejce":"Podgląd"}</div><h3>${p.name}</h3><div class="small muted">${p.sub} · ${p.time} · ${sets} serii</div></div></div>
+      <div class="pv-nav"><button class="btn ghost small" data-act="pvgo" data-d="-1" aria-label="Poprzedni trening">‹</button>
+      <button class="btn small" style="flex:1" data-act="${active?(active.wid===w?"resume":"busy"):"start"}" data-w="${w}">${active?(active.wid===w?"Wróć do treningu":"Masz otwarty inny trening"):"Zacznij ten trening"}</button>
+      <button class="btn ghost small" data-act="pvgo" data-d="1" aria-label="Następny trening">›</button></div></section>
+    <p class="note">Przesuń palcem w lewo lub w prawo, żeby zobaczyć inny trening.</p>
+    <div class="pv-list">${main.map(row).join("")}</div>
+    <h2 class="secthead">Brzuch</h2><div class="pv-list">${core.map(row).join("")}</div>
+    <p class="note">MC = masa ciała. Po treningu: ${esc(p.cardio)}</p></div>`;
+}
 function viewNoWorkout(){
   return `<div class="empty" style="margin-top:16px">Nie masz otwartego treningu. Wybierz, co dziś robisz.</div>
-  <div class="plans" style="margin-top:12px">${ORDER.map(k=>`<button class="plan" data-act="start" data-w="${k}">${plateHTML(k)}<div class="t"><strong>${PLAN[k].name}</strong><div class="meta">${PLAN[k].when}</div></div><span class="chev">›</span></button>`).join("")}</div>`;
+  <div class="plans" style="margin-top:12px">${ORDER.map(k=>`<button class="plan" data-act="start" data-w="${k}">${plateHTML(k)}<div class="t"><strong>${PLAN[k].name}</strong><div class="meta">${PLAN[k].sub}</div></div><span class="chev">›</span></button>`).join("")}</div>`;
 }
 
 function whyTag(p,e){
   const u=e.t==="db"?" na hantlę":"";
+  if(p.why==="up"&&e.ramp) return `<span class="tag up">↑ +${fmt(p.kg-p.base)} kg w każdej serii</span>`;
+  if(p.why==="down"&&e.ramp) return `<span class="tag down">↓ Lżej: ostatnio sporo poniżej celu</span>`;
+  if(p.why==="rampkeep") return `<span class="tag">Te same ciężary, dobij brakujące powtórzenia</span>`;
   if(p.why==="up") return `<span class="tag up">↑ +${fmt(p.kg-p.base)} kg${u}: ostatnio górny zakres</span>`;
   if(p.why==="down") return `<span class="tag down">↓ Lżej: ostatnio poniżej ${range(e.r)[0]} powt.</span>`;
   if(p.why==="keep") return `<span class="tag">Ten sam ciężar, +1 powtórzenie</span>`;
@@ -405,7 +480,7 @@ function exCard(e){
   return `<article class="ex ${done?"alldone":""}" data-ex="${e.id}">
     <div class="exh"><div class="t"><strong>${esc(e.n)}</strong>
       <div class="tags">${e.ss?`<span class="tag ss">Superseria ${e.ss}</span>`:""}${whyTag(p,e)}</div></div>
-      <div class="tgt num">${e.s}×${e.r}</div></div>
+      <div class="tgt num">${scheme(e)}</div></div>
     ${e.note?`<div class="last">${esc(e.note)}</div>`:""}
     ${lastTxt?`<div class="last">${esc(lastTxt)}</div>`:""}
     <div class="sets">${sets.map((x,j)=>`<div class="setrow ${x.done?"done":""} ${noKg?"nokg":""}" data-set="${j}">
@@ -447,9 +522,9 @@ function viewHist(){
     const del=`<button class="link" data-act="hdel" data-id="${s.id}">${delArm===s.id?"Na pewno usunąć? Dotknij jeszcze raz":"Usuń wpis"}</button>`;
     if(s.kind==="sport") return `<div class="hi"><button data-act="hopen" data-id="${s.id}"><div class="plate" style="--pc:var(--muted);width:36px;height:36px" aria-hidden="true"></div><div class="t"><strong>${esc(s.sport.type)}</strong><span class="small muted">${dateLbl(s.start)}</span></div><div class="st num">${esc(s.sport.min||"–")} min</div></button>
       ${open?`<div class="hd">${s.sport.note?`<div>${esc(s.sport.note)}</div>`:""}${del}</div>`:""}</div>`;
-    const p=PLAN[s.wid]; if(!p) return ""; const {v,n}=volume(s);
-    return `<div class="hi"><button data-act="hopen" data-id="${s.id}" aria-expanded="${open}">${plateHTML(s.wid)}<div class="t"><strong>${p.name}</strong><span class="small muted">${dateLbl(s.start)}</span></div><div class="st num">${n} serii<br>${Math.round(v).toLocaleString("pl-PL")} kg</div></button>
-    ${open?`<div class="hd">${p.ex.map(e=>{const a=(s.ex[e.id]||[]).filter(x=>x.done);if(!a.length)return"";return `<div class="r"><span>${esc(e.n)}</span><span>${a.map(x=>(e.t==="core"?"":fmt(x.kg)+"×")+esc(x.reps)).join(", ")}</span></div>`}).join("")}
+    const p=PLAN[s.wid]; if(!p) return ""; const {v,n}=volume(s); const nr=gymDone().findIndex(x=>x.id===s.id)+1;
+    return `<div class="hi"><button data-act="hopen" data-id="${s.id}" aria-expanded="${open}">${plateHTML(s.wid)}<div class="t"><strong>${p.name} <span class="muted" style="font-weight:500">· nr ${nr}</span></strong><span class="small muted">${dateLbl(s.start)} · ${p.sub}</span></div><div class="st num">${n} serii<br>${Math.round(v).toLocaleString("pl-PL")} kg</div></button>
+    ${open?`<div class="hd">${Object.keys(s.ex||{}).map(id=>{const a=(s.ex[id]||[]).filter(x=>x.done);if(!a.length)return"";const e=exInfo(id);return `<div class="r"><span>${esc(e.n)}</span><span>${a.map(x=>(e.t==="core"?"":fmt(x.kg)+"×")+esc(x.reps)).join(", ")}</span></div>`}).join("")}
       ${s.cardio&&s.cardio.done?`<div class="r"><span>Cardio</span><span>${esc(s.cardio.min||p.cardioMin)} min</span></div>`:""}${del}</div>`:""}</div>`}).join("")}</div>`;
 }
 
@@ -458,9 +533,9 @@ function viewMore(){
   const groups=ORDER.map(w=>{
     const rows=ue.filter(([ww,e])=>ww===w&&e.t!=="core").map(([ww,e])=>{
       const hist=lastFor(e.id);
-      return `<div class="sw"><div class="t">${esc(e.n)}<small>${hist?"Dalej liczy się samo z historii":KGHINT[e.t]}</small></div>
+      return `<div class="sw"><div class="t">${esc(e.n)}<small>${hist?"Dalej liczy się samo z historii":e.ramp?"najcięższa, ostatnia seria rampy":KGHINT[e.t]}</small></div>
         <div class="field"><input id="st-${e.id}" data-start="${e.id}" inputmode="decimal" value="${esc(fmt(settings.start[e.id]))}" placeholder="${e.t==="bw"?"0":"kg"}" aria-label="Ciężar startowy: ${esc(e.n)}"><em>${KGLBL[e.t]}</em></div></div>`}).join("");
-    return `<div class="startw"><div class="gh"><div class="plate pc-${PLAN[w].color}">${w}</div><b>${PLAN[w].name}</b></div>${rows}</div>`;
+    return `<div class="startw"><div class="gh"><div class="plate pc-${PLAN[w].color}">${NUM[w]}</div><b>${PLAN[w].name} · ${PLAN[w].sub}</b></div>${rows}</div>`;
   }).join("");
   const backup=STANDALONE?`<h2>Kopia zapasowa</h2><div class="rule"><p>Dane są tylko na tym telefonie. Raz na jakiś czas zapisz kopię do Plików albo na Dysk.</p>
     <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap"><button class="btn small" data-act="export">Zapisz kopię</button><label class="btn small ghost" for="importFile">Wczytaj kopię</label><input type="file" id="importFile" accept="application/json,.json" hidden></div></div>`:"";
@@ -470,6 +545,7 @@ function viewMore(){
   <button class="btn full" data-act="savestart" style="margin-top:12px">Zapisz ciężary</button>
   <h2>Jak liczy progresję</h2><div class="rules">
   <div class="rule"><div class="k">Górny zakres we wszystkich seriach</div><p>Następnym razem cięższe: sztanga, maszyny i dociążenie +2,5 kg, hantle +2 kg, wznosy bokiem +1 kg, leg press i hip thrust +5 kg, kettle +4 kg. Zaczynasz od dolnego zakresu powtórzeń.</p></div>
+  <div class="rule"><div class="k">Rampa 10-8-6 (pierwsze ćwiczenie)</div><p>Trzy serie z rosnącym ciężarem. Gdy zrobisz wszystkie powtórzenia w każdej serii, następnym razem +2,5 kg w każdej. Gdy zabraknie sporo w dwóch seriach, ciężar spada o ok. 5%.</p></div>
   <div class="rule"><div class="k">Środek zakresu</div><p>Ten sam ciężar, w każdej serii o jedno powtórzenie więcej niż ostatnio.</p></div>
   <div class="rule"><div class="k">Połowa serii poniżej zakresu</div><p>Ciężar w dół o ok. 5%, żeby wrócić do zakresu bez forsowania stawów.</p></div>
   <div class="rule"><div class="k">Brzuch bez ciężaru</div><p>Dokładasz powtórzenia do górnego zakresu, potem wolniejsze tempo.</p></div>
@@ -481,7 +557,7 @@ function viewMore(){
 function freshSets(e,excludeId){
   const p=prescribe(e,excludeId);
   if(active) (active.presc||(active.presc={}))[e.id]=p;
-  return Array.from({length:e.s},(_,j)=>({kg:p.kg==null?"":String(p.kg),reps:String(p.reps[j]),done:false}));
+  return Array.from({length:e.s},(_,j)=>{const k=p.kgs?p.kgs[j]:p.kg;return {kg:k==null?"":String(k),reps:String(p.reps[j]),done:false}});
 }
 function startWorkout(w){
   if(active&&active.wid!==w){toast("Najpierw zakończ albo porzuć bieżący trening.");setTab("wo");return}
@@ -505,6 +581,10 @@ document.addEventListener("click",ev=>{
   if(act!=="discard"&&act!=="hdel") delArm=null;
   if(act==="start") return startWorkout(a.dataset.w);
   if(act==="resume") return setTab("wo");
+  if(act==="busy"){toast("Najpierw zakończ albo porzuć otwarty trening.");return}
+  if(act==="preview"){preview=a.dataset.w;render();window.scrollTo(0,0);return}
+  if(act==="pvback"){preview=null;render();window.scrollTo(0,0);return}
+  if(act==="pvgo"){return goPreview(+a.dataset.d)}
   if(act==="gosetup") return setTab("more");
   if(act==="savestart"){document.querySelectorAll("[data-start]").forEach(i=>{const n=parseNum(i.value);if(n==null)delete settings.start[i.dataset.start];else settings.start[i.dataset.start]=n});saveSettings();toast("Zapisano ciężary startowe.");return setTab("plan")}
   if(act==="export") return doExport();
@@ -539,7 +619,7 @@ document.addEventListener("input",ev=>{
 document.addEventListener("change",ev=>{
   const el=ev.target;
   // weight changed in a set → carry it to the following sets not yet done
-  if(el.dataset.f==="kg"&&active){const id=el.closest("[data-ex]").dataset.ex,j=+el.closest("[data-set]").dataset.set,sets=active.ex[id];
+  if(el.dataset.f==="kg"&&active&&!(exById(el.closest("[data-ex]").dataset.ex)||{}).ramp){const id=el.closest("[data-ex]").dataset.ex,j=+el.closest("[data-set]").dataset.set,sets=active.ex[id];
     for(let k=j+1;k<sets.length;k++){if(!sets[k].done){sets[k].kg=sets[j].kg;const i=document.getElementById(`kg-${id}-${k}`);if(i)i.value=fmt(sets[j].kg)}}save(active)}
   if(el.dataset.warm!=null&&active){active.warm[+el.dataset.warm]=el.checked;save(active);const c=$("#warmCnt");if(c)c.textContent=active.warm.filter(Boolean).length+"/"+WARM.length}
   if(el.id==="cardioDone"&&active){active.cardio.done=el.checked;save(active)}
@@ -572,6 +652,10 @@ function doImport(file){
   r.readAsText(file);
 }
 
+let tx=null,ty=null;
+document.addEventListener("touchstart",ev=>{if(tab==="plan"&&preview&&ev.touches.length===1){tx=ev.touches[0].clientX;ty=ev.touches[0].clientY}else tx=null},{passive:true});
+document.addEventListener("touchend",ev=>{if(tx==null)return;const t=ev.changedTouches[0],dx=t.clientX-tx,dy=t.clientY-ty;tx=null;
+  if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(dy)*1.5) goPreview(dx<0?1:-1)},{passive:true});
 render();
 initStore();
 })();
