@@ -68,6 +68,10 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;text-transform:uppe
 .btn.ghost{background:var(--sunk);color:var(--ink)}
 .btn.full{width:100%}
 .btn.small{padding:8px 12px;font-size:14px;border-radius:10px}
+.love{background:linear-gradient(135deg,#FFE4EC,#FFD9C7);color:#3B1E24;border-radius:16px;padding:14px 16px;margin-top:12px;box-shadow:0 2px 10px rgba(230,90,120,.18)}
+.love .lh{font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#C2385E;margin-bottom:6px}
+.love p{margin:0 0 12px;font-size:16px;line-height:1.45}
+.love button{background:#C2385E;color:#fff;border:0;border-radius:999px;padding:9px 16px;font:inherit;font-weight:600;font-size:14px}
 .banner{display:flex;gap:12px;align-items:center;background:var(--warnbg);border-radius:14px;padding:12px 14px;margin-top:12px}
 .banner p{margin:0;flex:1;font-size:15px}
 
@@ -272,6 +276,10 @@ const TYPES=[["bb","Sztanga"],["db","Hantle"],["mc","Maszyna / wyciąg / Smith"]
 const WEEK=[{d:"Pn",w:"A"},{d:"Wt",w:"B"},{d:"Śr"},{d:"Cz",w:"C"},{d:"Pt"},{d:"So",w:"D"},{d:"Nd"}];
 const WEEKLBL=["Góra A","Dół A","wolne","Góra B","wolne","Dół B / sport","sport / Dół B"];
 const WARM=["Bieżnia 5 min, spokojnie","Mostki biodrowe bez ciężaru, 15 razy","1 lekka seria pierwszego ćwiczenia"];
+/* Słodkie notatki od Mateusza: nowa notatka = nowe id */
+const LOVE={id:"n1",text:"Hej Kochanie 🍑 Powodzenia na treningu! Jestem z Ciebie mega dumny, że tak ciśniesz. Pamiętaj, że jesteś najpiękniejsza i bardzo, bardzo Cię kocham ❤️"};
+const loveSeen=()=>{try{return localStorage.getItem("fzs_love_"+LOVE.id)==="1"}catch(e){return false}};
+const loveHTML=()=>LOVE&&!loveSeen()?`<div class="love" role="note"><div class="lh">💌 Od Mateusza</div><p>${esc(LOVE.text)}</p><button data-act="loveok">❤️ Też Cię kocham</button></div>`:"";
 const SPORTS=["Spacer","Bieganie","Basen","Rower","Inne"];
 const KGLBL={bb:"kg",db:"kg/szt.",mc:"kg",bw:"+kg",kb:"kg"};
 const KGHINT={bb:"cały ciężar ze sztangą",db:"jedna hantla",mc:"ciężar na stosie / Smithie",bw:"dociążenie, 0 = sama masa ciała",kb:"kettlebell"};
@@ -436,7 +444,7 @@ function viewPlan(){
   const ago=t=>{const d=Math.floor((Date.now()-t)/864e5);return d<=0?"dziś":d===1?"wczoraj":d+" dni temu"};
   const setup=needsSetup()?`<div class="banner"><p><b>${gymDone().length?"Uzupełnij ciężary dla nowych ćwiczeń.":"Ustaw ciężary startowe."}</b> Raz, ok. 2 min. Potem aplikacja sama podpowiada ciężar na każdą serię.</p><button class="btn small" data-act="gosetup">Ustaw</button></div>`:"";
   const last=g[g.length-1];
-  return `${setup}<section class="hero" style="--day:var(--${p.color})">
+  return `${loveHTML()}${setup}<section class="hero" style="--day:var(--${p.color})">
     <div class="hero-row">${plateHTML(w)}<div style="min-width:0"><div class="lbl">${title}</div><h3>${p.name}</h3><div class="small muted">${p.sub} · ${p.time}</div></div></div>
     <button class="btn full" data-act="${active?"resume":"start"}" data-w="${w}">${active?"Wróć do treningu":"Zacznij trening"}</button>
     ${last&&!active?`<div class="small muted">Ostatni: ${PLAN[last.wid].name}, ${ago(last.start)}. Łącznie ${g.length} ${g.length===1?"trening":g.length%10>=2&&g.length%10<=4&&(g.length%100<10||g.length%100>=20)?"treningi":"treningów"}.</div>`:""}</section>
@@ -581,6 +589,7 @@ function viewWorkout(){
   return `<div style="--day:var(--${p.color})">
   <div class="wohead">${plateHTML(s.wid)}<div class="t"><strong>${p.name}</strong><div class="small muted">Inaczej? Popraw i ✓</div><div class="prog"><i id="progBar"></i></div></div>
     <button class="btn small" data-act="finish">Zakończ</button></div>
+  ${loveHTML()}
   <details class="warm" ${s.warm.every(Boolean)?"":"open"}><summary><span>Rozgrzewka · 6 min</span><span class="muted num" id="warmCnt">${s.warm.filter(Boolean).length}/${WARM.length}</span></summary>
     ${WARM.map((w,i)=>`<label class="chk"><input type="checkbox" id="warm-${i}" data-warm="${i}" ${s.warm[i]?"checked":""}>${esc(w)}</label>`).join("")}</details>
   ${main.map(exCard).join("")}
@@ -662,6 +671,7 @@ document.addEventListener("click",ev=>{
   const a=ev.target.closest("[data-act]"); if(!a)return;
   const act=a.dataset.act;
   if(act!=="discard"&&act!=="hdel") delArm=null;
+  if(act==="loveok"){try{localStorage.setItem("fzs_love_"+LOVE.id,"1")}catch(e){}toast("❤️");render();return}
   if(act==="start") return startWorkout(a.dataset.w);
   if(act==="resume") return setTab("wo");
   if(act==="busy"){toast("Najpierw zakończ albo porzuć otwarty trening.");return}
