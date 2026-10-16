@@ -395,7 +395,7 @@ function prescribe(e,excludeId){
   const lk=kgsOf(last.sets), base=lk[0];
   const kgs=Array.from({length:e.s},(_,j)=>lk[j]??lk[lk.length-1]);
   const allTop=last.sets.length>=e.s&&reps.every(r=>r>=hi);
-  if(e.t==="bw"){ /* masa ciała: najpierw powtórzenia, dociążenie dopiero przy górnym zakresie */
+  if(e.t==="bw"||e.core){ /* masa ciała i brzuch: najpierw powtórzenia, dociążenie dopiero przy górnym zakresie */
     if(allTop&&inc) return {kg:addKg(base,inc),kgs:kgs.map(k=>addKg(k,inc)),reps:Array(e.s).fill(lo),why:"up",base,inc};
     return {kg:base,kgs,reps:Array.from({length:e.s},(_,j)=>clampR(at(j)+1)),why:"keep",base};
   }
