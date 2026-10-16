@@ -358,7 +358,8 @@ const NUM={A:1,B:2,C:3,D:4};
 const scheme=e=>e.ramp?"rampa "+e.ramp.join("-"):`${e.s}×${e.r}`;
 const plateHTML=w=>`<div class="plate pc-${PLAN[w].color}" aria-hidden="true">${NUM[w]}</div>`;
 function toast(msg){const h=$("#toastHost");h.innerHTML=`<div class="toast" role="status">${esc(msg)}</div>`;clearTimeout(toast.t);toast.t=setTimeout(()=>h.innerHTML="",2800)}
-const incOf=e=>e.inc!=null?e.inc:INC[e.t];
+const INC_ID={deadlift:5,squat:5,leg_press:5,hip_thrust:5};
+const incOf=e=>e.inc!=null?e.inc:(INC_ID[e.id]!=null?INC_ID[e.id]:INC[e.t]);
 const roundTo=(x,inc)=>inc?Math.round(x/inc)*inc:x;
 
 function finished(){return sessions.filter(s=>s.end&&s.kind).sort((a,b)=>b.start-a.start)}
@@ -368,47 +369,58 @@ function lastFor(exId,excludeId){
     if(sets.length) return {s,sets}; }
   return null;
 }
-/* Prescription: double progression */
+/* Prescription: same weights for 2 sessions of an exercise, then add the increment */
+function lastN(exId,excludeId,n){const out=[];
+  for(const s of finished()){ if(s.kind!=="gym"||s.id===excludeId) continue;
+    const sets=(s.ex&&s.ex[exId]||[]).filter(x=>x.done&&parseNum(x.reps)!=null);
+    if(sets.length){out.push({s,sets});if(out.length>=n)break} }
+  return out;
+}
+const kgsOf=sets=>sets.map(x=>parseNum(x.kg)??0);
+const sameKg=(a,b)=>a.length===b.length&&a.every((k,j)=>Math.abs(k-b[j])<0.01);
+const addKg=(k,inc)=>Math.round((k+inc)*100)/100;
 function rampPct(n){return n.map((_,j)=>1-0.075*(n.length-1-j))}
 function prescribeRamp(e,excludeId){
-  const inc=incOf(e)||2.5, tg=e.ramp, last=lastFor(e.id,excludeId);
+  const inc=incOf(e)||2.5, tg=e.ramp, hist=lastN(e.id,excludeId,2), last=hist[0];
   if(!last){
     const st=settings.start[e.id]; const top=st!=null&&st!==""?parseNum(st):null;
     if(top==null) return {kg:null,kgs:tg.map(()=>null),reps:tg.slice(),why:"need",base:null};
     return {kg:top,kgs:rampPct(tg).map(f=>roundTo(top*f,inc)),reps:tg.slice(),why:"start",base:top};
   }
-  const lk=last.sets.map(x=>parseNum(x.kg)??0), lr=last.sets.map(x=>parseNum(x.reps)??0);
+  const lk=kgsOf(last.sets), lr=last.sets.map(x=>parseNum(x.reps)??0);
   const top=Math.max(...lk);
   const isRamp=lk.length===tg.length&&lk.some((k,j)=>j>0&&k>lk[j-1]);
   const baseK=isRamp?lk:rampPct(tg).map(f=>roundTo(top*f,inc));
-  const hit=isRamp&&lr.every((r,j)=>r>=tg[j]);
-  const bad=lr.filter((r,j)=>r<(tg[j]??tg[tg.length-1])-2).length;
-  if(hit) return {kg:top+inc,kgs:baseK.map(k=>roundTo(k+inc,inc)),reps:tg.slice(),why:"up",base:top};
-  if(bad>=2&&top>0) return {kg:top,kgs:baseK.map(k=>Math.max(0,roundTo(k*0.95,inc))),reps:tg.slice(),why:"down",base:top};
-  return {kg:top,kgs:baseK,reps:tg.slice(),why:isRamp?"rampkeep":"start",base:top};
+  const bad=lr.filter((r,j)=>r<(tg[j]??tg[tg.length-1])-2).length>=2;
+  const twice=hist[1]&&sameKg(lk,kgsOf(hist[1].sets));
+  if(twice&&!bad) return {kg:addKg(top,inc),kgs:baseK.map(k=>addKg(k,inc)),reps:tg.slice(),why:"up",base:top,inc};
+  return {kg:top,kgs:baseK,reps:tg.slice(),why:bad?"hold":"repeat",base:top,inc};
 }
 function prescribe(e,excludeId){
   if(e.ramp) return prescribeRamp(e,excludeId);
   const [lo,hi]=range(e.r); const inc=incOf(e); const noKg=e.t==="core";
-  const last=lastFor(e.id,excludeId);
+  const hist=lastN(e.id,excludeId,2), last=hist[0];
   if(!last){
     const st=settings.start[e.id];
     const kg=noKg?null:(st!=null&&st!==""?parseNum(st):(e.t==="bw"?0:null));
     return {kg,reps:Array(e.s).fill(hi),why:kg==null&&!noKg?"need":"start",base:kg};
   }
-  const base=noKg?null:(parseNum(last.sets[0].kg)??0);
   const reps=last.sets.map(x=>parseNum(x.reps));
-  const kgOk=noKg||last.sets.every(x=>(parseNum(x.kg)??0)>=base);
-  const allTop=last.sets.length>=e.s&&reps.every(r=>r>=hi)&&kgOk;
-  const below=reps.filter(r=>r<lo).length;
-  if(allTop&&!noKg&&inc) return {kg:roundTo(base+inc,inc),reps:Array(e.s).fill(lo),why:"up",base};
-  if(allTop) return {kg:base,reps:Array(e.s).fill(hi),why:"max",base};
-  if(!noKg&&below>=Math.ceil(e.s/2)&&base>0){
-    const step=inc||2.5, drop=Math.max(step,roundTo(base*0.05,step));
-    return {kg:Math.max(0,roundTo(base-drop,step)),reps:Array(e.s).fill(hi),why:"down",base};
+  const at=j=>reps[j]??reps[reps.length-1];
+  const clampR=r=>Math.max(lo,Math.min(hi,r));
+  if(noKg) return {kg:null,reps:Array.from({length:e.s},(_,j)=>clampR(at(j)+1)),why:"core",base:null};
+  const lk=kgsOf(last.sets), base=lk[0];
+  const kgs=Array.from({length:e.s},(_,j)=>lk[j]??lk[lk.length-1]);
+  const allTop=last.sets.length>=e.s&&reps.every(r=>r>=hi);
+  if(e.t==="bw"){ /* masa ciała: najpierw powtórzenia, dociążenie dopiero przy górnym zakresie */
+    if(allTop&&inc) return {kg:addKg(base,inc),kgs:kgs.map(k=>addKg(k,inc)),reps:Array(e.s).fill(lo),why:"up",base,inc};
+    return {kg:base,kgs,reps:Array.from({length:e.s},(_,j)=>clampR(at(j)+1)),why:"keep",base};
   }
-  const tr=Array.from({length:e.s},(_,j)=>{const r=reps[j]??reps[reps.length-1];return Math.max(lo,Math.min(hi,r+1))});
-  return {kg:base,reps:tr,why:"keep",base};
+  const tr=Array.from({length:e.s},(_,j)=>clampR(at(j)));
+  const bad=reps.filter(r=>r<lo).length>=Math.ceil(e.s/2);
+  const twice=hist[1]&&sameKg(lk,kgsOf(hist[1].sets));
+  if(twice&&!bad&&inc) return {kg:addKg(base,inc),kgs:kgs.map(k=>addKg(k,inc)),reps:tr,why:"up",base,inc};
+  return {kg:base,kgs,reps:tr,why:bad?"hold":"repeat",base,inc};
 }
 function nextWorkout(){const g=finished().filter(s=>s.kind==="gym");if(!g.length)return"A";return ORDER[(ORDER.indexOf(g[0].wid)+1)%4]}
 function weekStart(){const d=new Date();d.setHours(0,0,0,0);d.setDate(d.getDate()-dayIdx());return d.getTime()}
@@ -550,13 +562,11 @@ function viewNoWorkout(){
 
 function whyTag(p,e){
   const u=e.t==="db"?" na hantlę":"";
-  if(p.why==="up"&&e.ramp) return `<span class="tag up">↑ +${fmt(p.kg-p.base)} kg w każdej serii</span>`;
-  if(p.why==="down"&&e.ramp) return `<span class="tag down">↓ Lżej: ostatnio sporo poniżej celu</span>`;
-  if(p.why==="rampkeep") return `<span class="tag">Te same ciężary, dobij brakujące powtórzenia</span>`;
-  if(p.why==="up") return `<span class="tag up">↑ +${fmt(p.kg-p.base)} kg${u}: ostatnio górny zakres</span>`;
-  if(p.why==="down") return `<span class="tag down">↓ Lżej: ostatnio poniżej ${range(e.r)[0]} powt.</span>`;
+  if(p.why==="up") return `<span class="tag up">↑ +${fmt(p.kg-p.base)} kg${e.ramp?" w każdej serii":u}: 2 treningi na tym samym ciężarze</span>`;
+  if(p.why==="repeat") return `<span class="tag">Ten sam ciężar 2. raz · następnym razem +${fmt(p.inc)} kg</span>`;
+  if(p.why==="hold") return `<span class="tag down">Ten sam ciężar: ostatnio sporo poniżej celu</span>`;
   if(p.why==="keep") return `<span class="tag">Ten sam ciężar, +1 powtórzenie</span>`;
-  if(p.why==="max") return `<span class="tag up">Górny zakres: zwolnij tempo</span>`;
+  if(p.why==="core") return `<span class="tag">+1 powtórzenie</span>`;
   if(p.why==="need") return `<span class="tag down">Wpisz ciężar w 1. serii</span>`;
   return `<span class="tag">Pierwszy trening</span>`;
 }
