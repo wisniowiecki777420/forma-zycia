@@ -72,6 +72,9 @@ h2{font-family:var(--display);font-weight:700;font-size:22px;text-transform:uppe
 .love .lh{font-weight:700;font-size:13px;letter-spacing:.04em;text-transform:uppercase;color:#C2385E;margin-bottom:6px}
 .love p{margin:0 0 12px;font-size:16px;line-height:1.45}
 .love button{background:#C2385E;color:#fff;border:0;border-radius:999px;padding:9px 16px;font:inherit;font-weight:600;font-size:14px}
+.love.tip{background:linear-gradient(135deg,#E8F4EA,#DDEFF5);color:#1E2B26;box-shadow:0 2px 10px rgba(60,140,110,.15)}
+.love.tip .lh{color:#2E7D5B}
+.love.tip button{background:#2E7D5B}
 .banner{display:flex;gap:12px;align-items:center;background:var(--warnbg);border-radius:14px;padding:12px 14px;margin-top:12px}
 .banner p{margin:0;flex:1;font-size:15px}
 
@@ -276,10 +279,12 @@ const TYPES=[["bb","Sztanga"],["db","Hantle"],["mc","Maszyna / wyciąg / Smith"]
 const WEEK=[{d:"Pn",w:"A"},{d:"Wt",w:"B"},{d:"Śr"},{d:"Cz",w:"C"},{d:"Pt"},{d:"So",w:"D"},{d:"Nd"}];
 const WEEKLBL=["Góra A","Dół A","wolne","Góra B","wolne","Dół B / sport","sport / Dół B"];
 const WARM=["Bieżnia 5 min, spokojnie","Mostki biodrowe bez ciężaru, 15 razy","1 lekka seria pierwszego ćwiczenia"];
-/* Słodkie notatki od Mateusza: nowa notatka = nowe id */
-const LOVE={id:"n1",text:"Hej Kochanie 🍑 Powodzenia na treningu! Jestem z Ciebie mega dumny, że tak ciśniesz. Pamiętaj, że jesteś najpiękniejsza i bardzo, bardzo Cię kocham ❤️"};
-const loveSeen=()=>{try{return localStorage.getItem("fzs_love_"+LOVE.id)==="1"}catch(e){return false}};
-const loveHTML=()=>LOVE&&!loveSeen()?`<div class="love" role="note"><div class="lh">💌 Od Mateusza</div><p>${esc(LOVE.text)}</p><button data-act="loveok">❤️ Też Cię kocham</button></div>`:"";
+/* Notatki: jedna na trening, rotacja co 20; 3/20 słodkie od Mateusza */
+const NOTES=[{"t": "love", "x": "Hej Kochanie 🍑 Powodzenia na treningu! Jestem z Ciebie mega dumny, że tak ciśniesz. Pamiętaj, że jesteś najpiękniejsza i bardzo, bardzo Cię kocham ❤️"}, {"t": "tip", "x": "Białko: 1,6–2 g na kg masy ciała dziennie. Przy 60 kg to ok. 100–120 g. Najprościej: porcja białka w każdym posiłku (mięso, ryba, jajka, skyr, twaróg)."}, {"t": "tip", "x": "Woda: ok. 30–35 ml na kg masy ciała dziennie, plus 0,5 l na każdą godzinę treningu. Przy 60 kg to ok. 2–2,5 l. Butelka zawsze pod ręką 💧"}, {"t": "tip", "x": "Tłuszcze: ok. 0,8–1 g na kg masy ciała dziennie. Przy 60 kg to ok. 50–60 g. Nie schodź niżej, bo tłuszcze są potrzebne do hormonów. Najlepsze: oliwa, orzechy, awokado, ryby."}, {"t": "tip", "x": "Węglowodany: to, co zostaje z kalorii po białku i tłuszczach, zwykle 2–3 g na kg. Przy 60 kg to ok. 120–180 g. Najwięcej zjedz przed treningiem i po nim: ryż, ziemniaki, owsianka, owoce."}, {"t": "tip", "x": "Redukcja: jedz ok. 300–500 kcal mniej niż spalasz. Dobre tempo to ok. 0,5 kg tygodniowo. Szybciej znaczy więcej głodu i ryzyko utraty mięśni z pośladków 🍑"}, {"t": "tip", "x": "Cardio: 15–20 min bieżni pod górkę po każdym treningu (nachylenie 10–12%, 4–5 km/h) plus 8–10 tys. kroków dziennie. Kroki spalają więcej, niż się wydaje 🚶‍♀️"}, {"t": "love", "x": "Mati Cię kocha ❤️ Serio, każdy Twój trening robi na mnie wrażenie. Po siłowni przytulas obowiązkowy 🤗"}, {"t": "tip", "x": "Przed treningiem: posiłek 1,5–3 h wcześniej z węglami i białkiem, np. owsianka ze skyrem albo ryż z kurczakiem. Na pusty żołądek siła siada."}, {"t": "tip", "x": "Po treningu: w ciągu ok. 2 h zjedz 25–40 g białka i porcję węgli. Mięśnie (i pośladki) rosną po treningu, nie na nim 🍑"}, {"t": "tip", "x": "Sen: 7–9 h. Przy niewyspaniu rośnie głód i ochota na słodkie, a regeneracja leży. Dobry sen to połowa redukcji 😴"}, {"t": "tip", "x": "Warzywa: pół talerza do każdego obiadu i kolacji. Mało kalorii, dużo objętości, sytość na dłużej. Celuj w 25–30 g błonnika dziennie 🥦"}, {"t": "tip", "x": "Waga: waż się rano, po toalecie, przed jedzeniem. Patrz na średnią z tygodnia, nie na jeden dzień. Wahania ±1–2 kg (woda, cykl, sól) są normalne."}, {"t": "tip", "x": "Postęp mierz nie tylko wagą: co 4 tygodnie obwód talii, bioder i pośladków plus zdjęcie w tym samym świetle. Pośladki mogą rosnąć, gdy waga stoi 📏"}, {"t": "love", "x": "Przypominam: Mati kocha Cię najbardziej na świecie ❤️ Dziś dajesz z siebie wszystko, a wieczorem odpoczywasz ze mną 😘"}, {"t": "tip", "x": "Słodycze i alkohol: zasada 80/20. 80% jedzenia „czystego”, 20% luzu. Alkohol to 7 kcal na gram i spowalnia regenerację, więc najlepiej max 1–2 razy w tygodniu 🍷"}, {"t": "tip", "x": "Hip thrust: na górze mocno spinasz pośladki i trzymasz 1–2 s, broda lekko do klatki, żebra w dół. Lepiej lżej z pełnym spięciem niż ciężko i plecami 🍑"}, {"t": "tip", "x": "Cierpliwość: pierwsze widoczne efekty przychodzą zwykle po 6–8 tygodniach, a wyraźne po 3–4 miesiącach. Najważniejsza jest regularność, nie perfekcja 💪"}, {"t": "tip", "x": "Progresja: aplikacja dokłada ciężar co 2 treningi. Jeśli nie zrobisz wszystkich powtórzeń, nic się nie dzieje: zostaje ten sam ciężar, aż wejdzie."}, {"t": "tip", "x": "Kawa przed treningiem (ok. 45 min wcześniej) może dodać energii. Po 16:00 lepiej odpuścić, bo psuje sen ☕"}];
+const noteIdx=()=>gymDone().length%NOTES.length;
+const noteSeen=()=>{try{return localStorage.getItem("fzs_note_seen")===String(gymDone().length)}catch(e){return false}};
+const loveHTML=()=>{if(noteSeen())return"";const n=NOTES[noteIdx()],love=n.t==="love";
+  return `<div class="love ${love?"":"tip"}" role="note"><div class="lh">${love?"💌 Od Mateusza":"💡 Tip na dziś"}</div><p>${esc(n.x)}</p><button data-act="loveok">${love?"❤️ Też Cię kocham":"OK 👍"}</button></div>`};
 const SPORTS=["Spacer","Bieganie","Basen","Rower","Inne"];
 const KGLBL={bb:"kg",db:"kg/szt.",mc:"kg",bw:"+kg",kb:"kg"};
 const KGHINT={bb:"cały ciężar ze sztangą",db:"jedna hantla",mc:"ciężar na stosie / Smithie",bw:"dociążenie, 0 = sama masa ciała",kb:"kettlebell"};
@@ -671,7 +676,7 @@ document.addEventListener("click",ev=>{
   const a=ev.target.closest("[data-act]"); if(!a)return;
   const act=a.dataset.act;
   if(act!=="discard"&&act!=="hdel") delArm=null;
-  if(act==="loveok"){try{localStorage.setItem("fzs_love_"+LOVE.id,"1")}catch(e){}toast("❤️");render();return}
+  if(act==="loveok"){const love=NOTES[noteIdx()].t==="love";try{localStorage.setItem("fzs_note_seen",String(gymDone().length))}catch(e){}toast(love?"❤️":"👍");render();return}
   if(act==="start") return startWorkout(a.dataset.w);
   if(act==="resume") return setTab("wo");
   if(act==="busy"){toast("Najpierw zakończ albo porzuć otwarty trening.");return}
