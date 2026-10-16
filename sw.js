@@ -5,6 +5,7 @@ self.addEventListener("activate",e=>{e.waitUntil(caches.keys().then(k=>Promise.a
 self.addEventListener("fetch",e=>{
   const r=e.request; if(r.method!=="GET") return;
   const u=new URL(r.url);
+  if(u.pathname.includes("/sandra/")) return;
   if(u.origin===location.origin&&(r.mode==="navigate"||u.pathname.endsWith("index.html"))){
     // network first for the app page, so updates arrive; cache when offline
     e.respondWith(fetch(r).then(res=>{const cp=res.clone();caches.open(C).then(c=>c.put("index.html",cp));return res}).catch(()=>caches.match("index.html")));return}
